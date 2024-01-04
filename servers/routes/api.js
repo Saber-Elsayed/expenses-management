@@ -54,4 +54,28 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+router.put("/", async (req, res) => {
+  try {
+    const { group1, group2 } = req.body;
+
+    const expenseToUpdate = await Expense.findOneAndUpdate(
+      { group: group1 },
+      { $set: { group: group2 } },
+      { new: true }
+    );
+
+    if (expenseToUpdate) {
+      res.send(
+        `Expense "${expenseToUpdate.item}" group changed from "${group1}" to "${group2}".`
+      );
+    } else {
+      res.status(404).send(`No expense found for group "${group1}".`);
+    }
+  } catch (error) {
+    console.error("Error updating expense group:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
