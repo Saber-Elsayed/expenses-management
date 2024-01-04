@@ -98,4 +98,36 @@ router.get("/:group", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const { d1, d2 } = req.query;
+
+    if (d1 && d2) {
+      const startDate = moment(d1, "YYYY-MM-DD");
+      const endDate = moment(d2, "YYYY-MM-DD");
+
+      const expenses = await Expense.find({
+        date: { $gte: startDate, $lte: endDate },
+      });
+
+      res.json(expenses);
+    } else if (d1) {
+      const startDate = moment(d1, "YYYY-MM-DD");
+      const endDate = moment(); // Current date
+
+      const expenses = await Expense.find({
+        date: { $gte: startDate, $lte: endDate },
+      });
+
+      res.json(expenses);
+    } else {
+      const expenses = await Expense.find();
+      res.json(expenses);
+    }
+  } catch (error) {
+    console.error("Error fetching expenses by date range:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
